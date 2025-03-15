@@ -1,0 +1,5 @@
+.venv
+.env
+fileInfo.ini
+.pyc
+__pycache__
