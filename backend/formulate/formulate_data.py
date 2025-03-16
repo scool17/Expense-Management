@@ -1,19 +1,53 @@
 
 import pandas as pd
-
+from backend.formulate.config_parser import Parser
+from backend.formulate.constants import DF_TYPE_COLUMNS, FORMAT
 
 class FormulateData(object):
 
     def __init__(self):
-        pass
+        self.parser = Parser()
+        month_map = self.parser.get_month_map()
+        self.monthly_expenses = dict()
+        self.formulate(month_map)
+        self.export_to_csv()
 
-    def formulate_csv(df):
-        pass
+    def getattr(self):
+        return self.monthly_expenses
 
-    def formulate_sheet(df):
-        pass
+    def formulate(self, month_map):
+        for type in DF_TYPE_COLUMNS:
+            for month in month_map[FORMAT][type]:
+                self.monthly_expenses.update({month: self.formulate_df(month_map[month], type)})
 
-    def formulate_txt(self, df, file_path, sheet_name):
-        FormulateData.read_txt(file_path)
-        df[['Description', 'Cost_Date']] = df['April expenses'].str.split("-", expand=True)
-        df[["Cost", "Date"]] = df['Cost_Date'].str.split("(", expand=True)
+    def formulate_df(self, df, type):
+        new_df = df.copy()
+        new_df.drop_duplicates(inplace=True)
+        if type == 'Manual':
+            return self.formulate_txt(new_df)
+        if type == 'Type 2':
+            return self.formulate_type2(new_df)
+        new_df = new_df[DF_TYPE_COLUMNS[type]]
+        new_df.dropna(how='all', inplace=True)
+        return new_df
+
+    def formulate_txt(self, df):
+        col_name = df.columns[0]
+        df['Description'] = df[col_name].str.replace(' - ', ' ')
+        df[['Description', 'Amount', 'Date']] = df[col_name].str.extract(r'(.*) - (\d+)(\(\d+/\d+\))?')
+        df['Date'] = df['Date'].str.replace('(', '').str.replace(')', '')
+        df['Amount'] = pd.to_numeric(df['Amount'])
+        df.drop(col_name, axis=1, inplace=True)
+        df.dropna(how='all', inplace=True)
+        return df
+    
+    def formulate_type2(self, df):
+        df = df[DF_TYPE_COLUMNS['Type 2']]
+        df['amount'] = df['amount'].abs()
+        df.dropna(how='all', inplace=True)
+        return df
+    
+    def export_to_csv(self):
+        with pd.ExcelWriter(self.parser.export_file_name, engine='xlsxwriter') as writer:
+            for month in self.monthly_expenses:
+                self.monthly_expenses[month].to_excel(writer, sheet_name=month)

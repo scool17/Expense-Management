@@ -11,11 +11,10 @@ if __name__ == "__main__":
     fd = FormulateData()
     p = Parser()
 
-     
-    print(len(p.month_map), p.month_map)
-
     # file_path = folder_path + "/" + file_name
     # print(file_path)
 
     # df = pd.read_csv(file_path)
     # print(df)
+    print(fd.getattr())
+    # print(fd.monthly_expenses['June_2024'])
