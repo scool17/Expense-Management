@@ -1,11 +1,12 @@
 import configparser
 import pandas as pd
-from backend.formulate.constants import FORMAT, SHEETS, CSV, TEXT, NumToMonth
+from backend.utilities.constants import FORMAT, SHEETS, CSV, TEXT, NumToMonth, INI_FILENAME
+from backend.utilities.utility import get_dataframe, read_csv, read_txt, read_excel, get_folder_path
 
 class Parser(configparser.ConfigParser):
     def __init__(self):
         super().__init__()
-        self.read('backend/fileInfo.ini')
+        self.read(get_folder_path(INI_FILENAME))
         self.month_map = {FORMAT: {'Excel': [], 'Manual': [], 'Type 1': [], 'Type 2': []}}
         self.trip_map = dict()
         self.folder_path = self.get('Global', 'folderPath')
@@ -59,19 +60,6 @@ class Parser(configparser.ConfigParser):
             self.month_map[NumToMonth[int(month)] + '_' + year] = get_dataframe(read_txt, (self.folder_path.strip('"') + '/' + self.get_filename(TEXT, i).strip('"')))
             self.month_map[FORMAT]['Manual'].append(NumToMonth[int(month)] + '_' + year)
 
-
-def get_dataframe(function_name, file_path, sheet_name=None):
-    return function_name(file_path, sheet_name)
-
-def read_csv(file_path, sheet_name=None):
-    return pd.read_csv(file_path)
-
-def read_excel(file_path, sheet_name):
-    xls = pd.ExcelFile(file_path)
-    return pd.read_excel(xls, sheet_name)
-
-def read_txt(file_path, sheet_name=None):
-    return pd.read_csv(file_path)
 
 # def parse_string(csv):
 #     csv_items = list()

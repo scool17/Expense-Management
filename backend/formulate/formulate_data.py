@@ -1,7 +1,8 @@
 
 import pandas as pd
 from backend.formulate.config_parser import Parser
-from backend.formulate.constants import DF_TYPE_COLUMNS, FORMAT
+from backend.utilities.constants import DF_TYPE_COLUMNS, FORMAT, EXPORT_FILENAME
+from backend.utilities.utility import get_folder_path
 
 class FormulateData(object):
 
@@ -48,6 +49,6 @@ class FormulateData(object):
         return df
     
     def export_to_csv(self):
-        with pd.ExcelWriter(self.parser.export_file_name, engine='xlsxwriter') as writer:
+        with pd.ExcelWriter(get_folder_path(EXPORT_FILENAME), engine='xlsxwriter') as writer:
             for month in self.monthly_expenses:
                 self.monthly_expenses[month].to_excel(writer, sheet_name=month)
