@@ -9,7 +9,7 @@ folder_path = "/mnt/c/users/shubh/onedrive/PersonalProjects/ExpenseTracker/DataD
 file_name = "June 2024.txt"
 
 if __name__ == "__main__":
-    fd = FormulateData()
+    # fd = FormulateData()
     # p = Parser()
 
     # file_path = folder_path + "/" + file_name

@@ -4,3 +4,4 @@ fileInfo.ini
 .pyc
 __pycache__
 push_temp
+pyrightconfig.json
